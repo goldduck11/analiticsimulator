@@ -9,5 +9,4 @@ public class AnaliticsimulatorApplication {
     public static void main(String[] args) {
         SpringApplication.run(AnaliticsimulatorApplication.class, args);
     }
-
 }
