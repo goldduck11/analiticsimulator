@@ -3,9 +3,11 @@ package ru.courseproject.analiticsimulator.util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import ru.courseproject.analiticsimulator.model.*;
-import ru.courseproject.analiticsimulator.repository.TaskRepository;
-import ru.courseproject.analiticsimulator.repository.TopicRepository;
+import ru.courseproject.analiticsimulator.task.task.enums.TaskType;
+import ru.courseproject.analiticsimulator.task.task.repository.TaskRepository;
+import ru.courseproject.analiticsimulator.task.topic.model.Topic;
+import ru.courseproject.analiticsimulator.task.topic.repository.TopicRepository;
+import ru.courseproject.analiticsimulator.task.task.model.Task;
 
 import java.util.List;
 
