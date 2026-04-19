@@ -6,12 +6,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.courseproject.analiticsimulator.dto.LoginRequest;
-import ru.courseproject.analiticsimulator.dto.RegisterRequest;
-import ru.courseproject.analiticsimulator.dto.JwtResponse;
 import ru.courseproject.analiticsimulator.auth.service.AuthService;
+import ru.courseproject.analiticsimulator.dto.AuthResponse;
+import ru.courseproject.analiticsimulator.dto.RegisterRequest;
 
-@Tag(name = "Аутентификация", description = "API для регистрации и входа")
+@Tag(name = "Authentication", description = "Registration API")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -19,17 +18,10 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "Вход в систему")
-    @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        JwtResponse response = authService.login(loginRequest);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Регистрация нового пользователя")
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
-    public ResponseEntity<JwtResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        JwtResponse response = authService.register(registerRequest);
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        AuthResponse response = authService.register(registerRequest);
         return ResponseEntity.ok(response);
     }
 }
