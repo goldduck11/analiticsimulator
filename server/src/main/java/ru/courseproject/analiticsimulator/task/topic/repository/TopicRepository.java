@@ -1,12 +1,9 @@
 package ru.courseproject.analiticsimulator.task.topic.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import ru.courseproject.analiticsimulator.task.topic.model.Topic;
 
-/**
- * Репозиторий для работы с темами заданий
- */
-@Repository
-public interface TopicRepository extends JpaRepository<Topic, Long> {
+@ApplicationScoped
+public class TopicRepository implements PanacheRepository<Topic> {
 }

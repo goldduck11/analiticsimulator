@@ -1,32 +1,49 @@
 package ru.courseproject.analiticsimulator.user.account.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import ru.courseproject.analiticsimulator.user.account.model.User;
 
 import java.util.Optional;
 
-/**
- * Репозиторий для работы с пользователями
- */
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+@ApplicationScoped
+public class UserRepository implements PanacheRepository<User> {
 
-    /**
-     * Найти пользователя по email
-     */
-    Optional<User> findByEmail(String email);
+    public Optional<User> findByEmail(String email) {
+        return find("email", email).firstResultOptional();
+    }
 
-    /**
-     * Проверить, существует ли пользователь с таким email
-     */
-    boolean existsByEmail(String email);
+    public User findByEmailOrUsername(String email, String username) {
+        return find("email = ?1 OR username = ?2", email, username).firstResult();
+    }
 
-    /**
-     * Получить пользователя с его прогрессом (ленивая загрузка, но можно переопределить через JOIN)
-     */
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.progressList WHERE u.email = :email")
-    Optional<User> findByEmailWithProgress(@Param("email") String email);
+    public boolean existsByEmail(String email) {
+        return count("email", email) > 0;
+    }
+
+    public boolean existsByUsername(String username) {
+        return count("username", username) > 0;
+    }
+
+    public boolean existsByEmailAndUsername(String email, String username) {
+        return count("email = ?1 AND username = ?2", email, username) > 0;
+    }
+
+    public boolean existsByEmailOrUsername(String email, String username) {
+        return count("email = ?1 OR username = ?2", email, username) > 0;
+    }
+
+    public Optional<User> findByEmailWithProgress(String email) {
+        return getEntityManager().createQuery(
+                        "SELECT u FROM User u LEFT JOIN FETCH u.progressList WHERE u.email = :email", User.class)
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst();
+    }
+
+    @Transactional
+    public void save(User user) {
+        persist(user);
+    }
 }

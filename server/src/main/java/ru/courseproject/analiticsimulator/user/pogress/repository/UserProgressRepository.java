@@ -1,65 +1,53 @@
 package ru.courseproject.analiticsimulator.user.pogress.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
 
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Репозиторий для отслеживания прогресса пользователя
- */
-@Repository
-public interface UserProgressRepository extends JpaRepository<UserProgress, Long> {
+@ApplicationScoped
+public class UserProgressRepository implements PanacheRepository<UserProgress> {
 
-    /**
-     * Найти прогресс пользователя по конкретной задаче
-     */
-    Optional<UserProgress> findByUserIdAndTaskId(Long userId, Long taskId);
+    public Optional<UserProgress> findByUserIdAndTaskId(Long userId, Long taskId) {
+        return find("user.id = ?1 AND task.id = ?2", userId, taskId).firstResultOptional();
+    }
 
-    /**
-     * Найти весь прогресс пользователя
-     */
-    List<UserProgress> findByUserId(Long userId);
+    public List<UserProgress> findByUserId(Long userId) {
+        return list("user.id", userId);
+    }
 
-    /**
-     * Найти прогресс пользователя с загрузкой связанных сущностей
-     */
-    @Query("""
-        SELECT up FROM UserProgress up 
-        WHERE up.user.id = :userId
-        """)
-    List<UserProgress> findByUserIdWithDetails(@Param("userId") Long userId);
+    public List<UserProgress> findByUserIdWithDetails(Long userId) {
+        return getEntityManager().createQuery(
+                        "SELECT up FROM UserProgress up WHERE up.user.id = :userId", UserProgress.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
 
-    /**
-     * Обновить прогресс: ответ, статус, баллы
-     */
-    @Modifying
-    @Query("""
-        UPDATE UserProgress up 
-        SET up.userAnswer = :answer, 
-            up.completed = true, 
-            up.score = :score, 
-            up.completedAt = CURRENT_TIMESTAMP 
-        WHERE up.id = :id
-        """)
-    void updateProgress(@Param("id") Long id,
-                        @Param("answer") String answer,
-                        @Param("score") int score);
+    @Transactional
+    public void updateProgress(Long id, String answer, int score) {
+        update("userAnswer = ?1, completed = true, score = ?2, completedAt = CURRENT_TIMESTAMP WHERE id = ?3",
+                answer, score, id);
+    }
 
-    /**
-     * Посчитать общее количество выполненных заданий пользователем
-     */
-    @Query("SELECT COUNT(up) FROM UserProgress up WHERE up.user.id = :userId AND up.completed = true")
-    long countCompletedTasksByUserId(@Param("userId") Long userId);
+    public long countCompletedTasksByUserId(Long userId) {
+        return count("user.id = ?1 AND completed = true", userId);
+    }
 
-    /**
-     * Посчитать суммарный балл пользователя
-     */
-    @Query("SELECT COALESCE(SUM(up.score), 0) FROM UserProgress up WHERE up.user.id = :userId")
-    int getTotalScoreByUserId(@Param("userId") Long userId);
+    public int getTotalScoreByUserId(Long userId) {
+        Integer total = getEntityManager().createQuery(
+                        "SELECT COALESCE(SUM(up.score), 0) FROM UserProgress up WHERE up.user.id = :userId", Integer.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
+        return total == null ? 0 : total;
+    }
+
+    @Transactional
+    public void save(UserProgress userProgress) {
+        if (userProgress.getId() == null) {
+            persist(userProgress);
+        }
+    }
 }

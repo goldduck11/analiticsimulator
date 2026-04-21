@@ -1,41 +1,32 @@
 package ru.courseproject.analiticsimulator.user.account.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
 import ru.courseproject.analiticsimulator.dto.UserDto;
 import ru.courseproject.analiticsimulator.user.account.model.User;
 import ru.courseproject.analiticsimulator.user.account.repository.UserRepository;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
+@ApplicationScoped
 public class UserService {
 
     private final UserRepository userRepository;
 
-    /**
-     * Получить профиль пользователя по email
-     */
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return mapToDto(user);
     }
 
-    /**
-     * Проверить, существует ли пользователь с таким email
-     */
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    /**
-     * Получить сущность User по email (для внутреннего использования)
-     */
     public User getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     private UserDto mapToDto(User user) {

@@ -1,52 +1,36 @@
-src/
-└── main/
-    ├── java/ru/courseproject/analiticsimulator/
-    │   │
-    │   ├── AnaliticsimulatorApplication.java     ← @SpringBootApplication
-    │   │
-    │   ├── config/
-    │   │   ├── SecurityConfig.java               ← Настройка Spring Security + JWT
-    │   │   ├── WebConfig.java                    ← CORS, форматы и т.п.
-    │   │   └── SwaggerConfig.java                ← OpenAPI (для документации API)
-    │   │
-    │   ├── controller/
-    │   │   ├── AuthController.java               ← /api/auth/login, /register
-    │   │   ├── UserController.java               ← /api/user/profile
-    │   │   └── TaskController.java               ← /api/tasks, /submit
-    │   │
-    │   ├── service/
-    │   │   ├── UserService.java
-    │   │   ├── TaskService.java
-    │   │   └── UserProgressService.java
-    │   │
-    │   ├── repository/
-    │   │   ├── UserRepository.java
-    │   │   ├── TaskRepository.java
-    │   │   └── UserProgressRepository.java
-    │   │
-    │   ├── model/
-    │   │   ├── User.java                         ← @Entity
-    │   │   ├── Task.java
-    │   │   ├── UserProgress.java
-    │   │   ├── Topic.java
-    │   │   └── TaskType.java                     ← enum
-    │   │
-    │   ├── dto/
-    │   │   ├── LoginRequest.java
-    │   │   ├── RegisterRequest.java
-    │   │   ├── TaskDto.java
-    │   │   └── ProgressResponse.java
-    │   │
-    │   ├── security/
-    │   │   ├── JwtTokenProvider.java             ← Генерация и валидация JWT
-    │   │   ├── CustomUserDetailsService.java
-    │   │   └── JwtAuthFilter.java                ← Фильтр для проверки токена
-    │   │
-    │   └── util/
-    │       └── SampleDataLoader.java             ← @Component + @PostConstruct → загрузка тестовых заданий
-    │
-    └── resources/
-        ├── application.yml                       ← Настройки БД, server.port и т.д.
-        ├── data.sql                              ← Начальные данные (опционально)
-        ├── schema.sql                            ← DDL таблиц
-        └── import.sql                            ← Альтернатива data.sql (если используется H2 для dev)
+# Analitic Simulator Server (Quarkus)
+
+Backend migrated from Spring Boot to Quarkus.
+
+## Stack
+
+- Quarkus REST (JAX-RS)
+- Quarkus Arc (CDI)
+- Hibernate ORM + Panache
+- PostgreSQL
+- Bean Validation
+- SmallRye OpenAPI / Swagger UI
+
+## Run
+
+1. Start PostgreSQL (for example with `compose.yaml`).
+2. Set env vars if needed:
+   - `DB_URL` (default: `jdbc:postgresql://localhost:5432/mydatabase`)
+   - `DB_USERNAME` (default: `myuser`)
+   - `DB_PASSWORD` (default: `secret`)
+3. Run app:
+   - `./mvnw quarkus:dev`
+
+## Security model
+
+- Public endpoints:
+  - `POST /api/auth/login`
+  - `POST /api/auth/register`
+- Protected endpoints:
+  - `/api/*` (except public ones)
+- HTTP Basic auth is enabled and validated against `users` table.
+
+## API docs
+
+- OpenAPI: `/q/openapi`
+- Swagger UI: `/q/swagger-ui`

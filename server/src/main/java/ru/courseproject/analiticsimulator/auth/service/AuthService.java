@@ -1,35 +1,45 @@
 package ru.courseproject.analiticsimulator.auth.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+import org.mindrot.jbcrypt.BCrypt;
 import ru.courseproject.analiticsimulator.dto.AuthResponse;
+import ru.courseproject.analiticsimulator.dto.LoginRequest;
 import ru.courseproject.analiticsimulator.dto.RegisterRequest;
 import ru.courseproject.analiticsimulator.user.account.model.User;
 import ru.courseproject.analiticsimulator.user.account.repository.UserRepository;
 
-@Service
-@RequiredArgsConstructor
-@Transactional
+@ApplicationScoped
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public AuthResponse authentication(LoginRequest loginRequest) {
+        User user = userRepository.findByEmailOrUsername(loginRequest.getEmailOrUsername(), loginRequest.getEmailOrUsername());
+        if (user == null || !BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
+            return null;
+        }
+        return new AuthResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail());
+    }
+
+    @Transactional
     public AuthResponse register(RegisterRequest registerRequest) {
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email already exists: " + registerRequest.getEmail());
+        if (userRepository.existsByEmailOrUsername(registerRequest.getEmail(), registerRequest.getUsername())) {
+            return null;
         }
 
         User user = new User();
         user.setName(registerRequest.getName());
+        user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setPassword(BCrypt.hashpw(registerRequest.getPassword(), BCrypt.gensalt()));
         user.setRole("USER");
 
         userRepository.save(user);
-
-        return new AuthResponse(user.getId(), user.getName(), user.getEmail());
+        return new AuthResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail());
     }
 }

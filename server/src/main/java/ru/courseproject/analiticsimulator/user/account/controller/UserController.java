@@ -1,29 +1,30 @@
 package ru.courseproject.analiticsimulator.user.account.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import ru.courseproject.analiticsimulator.dto.UserDto;
 import ru.courseproject.analiticsimulator.user.account.service.UserService;
 
-@Tag(name = "User", description = "API for user profile")
-@RestController
-@RequestMapping("/api/user")
-@RequiredArgsConstructor
+@Path("/api/user")
+@Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public class UserController {
 
     private final UserService userService;
+    private final SecurityIdentity securityIdentity;
 
-    @Operation(summary = "Get current profile")
-    @GetMapping("/profile")
-    public ResponseEntity<UserDto> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        UserDto userDto = userService.getUserByEmail(userDetails.getUsername());
-        return ResponseEntity.ok(userDto);
+    public UserController(UserService userService, SecurityIdentity securityIdentity) {
+        this.userService = userService;
+        this.securityIdentity = securityIdentity;
+    }
+
+    @GET
+    @Path("/profile")
+    public UserDto getProfile() {
+        return userService.getUserByEmail(securityIdentity.getPrincipal().getName());
     }
 }

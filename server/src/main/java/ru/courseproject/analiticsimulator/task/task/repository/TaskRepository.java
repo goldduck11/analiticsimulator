@@ -1,48 +1,34 @@
-// src/main/java/ru/courseproject/analiticsimulator/repository/TaskRepository.java
 package ru.courseproject.analiticsimulator.task.task.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-import ru.courseproject.analiticsimulator.task.task.model.Task;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import ru.courseproject.analiticsimulator.task.task.enums.TaskType;
+import ru.courseproject.analiticsimulator.task.task.model.Task;
 
 import java.util.List;
 
-/**
- * Репозиторий для работы с заданиями
- */
-@Repository
-public interface TaskRepository extends JpaRepository<Task, Long> {
+@ApplicationScoped
+public class TaskRepository implements PanacheRepository<Task> {
 
-    /**
-     * Найти все задания, отсортированные по ID
-     */
-    List<Task> findAllByOrderById();
+    public List<Task> findAllByOrderById() {
+        return list("ORDER BY id");
+    }
 
-    /**
-     * Найти задания по типу (использует enum TaskType)
-     */
-    List<Task> findByType(TaskType type);
+    public List<Task> findByType(TaskType type) {
+        return list("type", type);
+    }
 
-    /**
-     * Найти задания по теме (по topic.id)
-     */
-    List<Task> findByTopicId(Long topicId);
+    public List<Task> findByTopicId(Long topicId) {
+        return list("topic.id", topicId);
+    }
 
-    /**
-     * Найти задания по типу и теме
-     * Использует enum TaskType и ID темы
-     */
-    List<Task> findByTypeAndTopicId(TaskType type, Long topicId);
+    public List<Task> findByTypeAndTopicId(TaskType type, Long topicId) {
+        return list("type = ?1 AND topic.id = ?2", type, topicId);
+    }
 
-    /**
-     * Получить все задания с информацией о теме (JOIN для оптимизации)
-     */
-    @Query("""
-        SELECT t FROM Task t 
-        LEFT JOIN FETCH t.topic 
-        ORDER BY t.id
-        """)
-    List<Task> findAllWithTopic();
+    public List<Task> findAllWithTopic() {
+        return getEntityManager().createQuery(
+                        "SELECT t FROM Task t LEFT JOIN FETCH t.topic ORDER BY t.id", Task.class)
+                .getResultList();
+    }
 }

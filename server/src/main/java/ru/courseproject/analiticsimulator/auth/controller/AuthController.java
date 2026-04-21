@@ -1,27 +1,45 @@
 package ru.courseproject.analiticsimulator.auth.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import ru.courseproject.analiticsimulator.auth.service.AuthService;
 import ru.courseproject.analiticsimulator.dto.AuthResponse;
+import ru.courseproject.analiticsimulator.dto.LoginRequest;
 import ru.courseproject.analiticsimulator.dto.RegisterRequest;
 
-@Tag(name = "Authentication", description = "Registration API")
-@RestController
-@RequestMapping("/api/auth")
-@RequiredArgsConstructor
+@Path("/api/auth")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "Register a new user")
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @POST
+    @Path("/login")
+    public Response authentication(@Valid LoginRequest authRequest) {
+        AuthResponse response = authService.authentication(authRequest);
+        if (response == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username/email or password.").build();
+        }
+        return Response.ok(response).build();
+    }
+
+    @POST
+    @Path("/register")
+    public Response register(@Valid RegisterRequest registerRequest) {
         AuthResponse response = authService.register(registerRequest);
-        return ResponseEntity.ok(response);
+        if (response == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Email or username already exists.").build();
+        }
+        return Response.ok(response).build();
     }
 }
