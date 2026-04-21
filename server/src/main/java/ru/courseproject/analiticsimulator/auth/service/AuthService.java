@@ -9,6 +9,8 @@ import ru.courseproject.analiticsimulator.dto.RegisterRequest;
 import ru.courseproject.analiticsimulator.user.account.model.User;
 import ru.courseproject.analiticsimulator.user.account.repository.UserRepository;
 
+import javax.naming.AuthenticationException;
+
 @ApplicationScoped
 public class AuthService {
 
@@ -18,12 +20,11 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
-    public AuthResponse authentication(LoginRequest loginRequest) {
+    public void authentication(LoginRequest loginRequest) throws AuthenticationException {
         User user = userRepository.findByEmailOrUsername(loginRequest.getEmailOrUsername(), loginRequest.getEmailOrUsername());
         if (user == null || !BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
-            return null;
+            throw new AuthenticationException("Неверное имя пользователя или пароля");
         }
-        return new AuthResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail());
     }
 
     @Transactional

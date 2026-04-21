@@ -29,6 +29,10 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    public boolean existsByEmailOrUsername(String username, String email) {
+        return userRepository.existsByEmailOrUsername(username, email);
+    }
+
     private UserDto mapToDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
