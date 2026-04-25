@@ -10,9 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import ru.courseproject.analiticsimulator.dto.SubmissionRequest;
-import ru.courseproject.analiticsimulator.dto.SubmissionResult;
-import ru.courseproject.analiticsimulator.dto.TaskDto;
+import ru.courseproject.analiticsimulator.dto.*;
 import ru.courseproject.analiticsimulator.task.task.service.TaskService;
 
 import java.util.List;
@@ -24,22 +22,26 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final SecurityIdentity securityIdentity;
 
     public TaskController(TaskService taskService, SecurityIdentity securityIdentity) {
         this.taskService = taskService;
-        this.securityIdentity = securityIdentity;
     }
 
     @GET
-    public List<TaskDto> getAllTasks() {
-        return taskService.getAllTasks();
+    @Path("/topics")
+    public List<TopicDto> getAllTopics() {
+        return taskService.getAllTopics();
+    }
+
+    @GET
+    @Path("/tasks")
+    public List<UserProgressDto> getAllTasks() {
+        return taskService.getAllTasksWithProgress();
     }
 
     @POST
     @Path("/submit/{taskId}")
     public SubmissionResult submitAnswer(@PathParam("taskId") Long taskId, @Valid SubmissionRequest submission) {
-        String email = securityIdentity.getPrincipal().getName();
-        return taskService.submitAnswer(email, taskId, submission.getAnswer());
+        return taskService.submitAnswer(taskId, submission.getAnswer());
     }
 }

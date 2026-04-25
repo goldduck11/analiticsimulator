@@ -1,6 +1,7 @@
 package ru.courseproject.analiticsimulator.user.pogress.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
@@ -16,7 +17,7 @@ public class UserProgressRepository implements PanacheRepository<UserProgress> {
     }
 
     public List<UserProgress> findByUserId(Long userId) {
-        return list("user.id", userId);
+        return list("user.id", Sort.descending("completedAt"), userId);
     }
 
     public List<UserProgress> findByUserIdWithDetails(Long userId) {

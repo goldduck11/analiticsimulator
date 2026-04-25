@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -39,7 +40,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String role = "USER";
+    private Set<String> role = Set.of("USER");
 
     @OneToMany(mappedBy = "user", cascade = jakarta.persistence.CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserProgress> progressList;

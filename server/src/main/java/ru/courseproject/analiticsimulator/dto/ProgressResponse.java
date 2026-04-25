@@ -2,6 +2,7 @@ package ru.courseproject.analiticsimulator.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,8 +19,7 @@ public class ProgressResponse {
     @Data
     public static class TaskProgressDto {
         private Long taskId;
-        private String taskType;
-        private String topicName;
+        private Long topicId;
         private boolean completed;
         private Integer score;
         private String userAnswer;

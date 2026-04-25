@@ -1,6 +1,9 @@
 package ru.courseproject.analiticsimulator.dto;
 
 import lombok.Data;
+import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
+
+import java.io.Serializable;
 
 /**
  * DTO для передачи информации о задании клиенту
@@ -8,9 +11,10 @@ import lombok.Data;
 @Data
 public class TaskDto {
 
-    private Long id;
+    private Long taskId;
     private String question;
-    private String type;
-    private String topicName;
-    private String hint;
+    private Long topicId;
+    private String taskType;
+    private String complexity;
+
 }

@@ -33,10 +33,14 @@ public class UserService {
         return userRepository.existsByEmailOrUsername(username, email);
     }
 
+    public UserDto getUserByIdentity(Long identity) {
+        User user = userRepository.findById(identity);
+        return mapToDto(user);
+    }
+
     private UserDto mapToDto(User user) {
         UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
+        dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         return dto;
     }

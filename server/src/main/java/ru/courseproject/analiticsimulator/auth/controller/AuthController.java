@@ -13,6 +13,7 @@ import ru.courseproject.analiticsimulator.auth.service.AuthService;
 import ru.courseproject.analiticsimulator.dto.AuthResponse;
 import ru.courseproject.analiticsimulator.dto.LoginRequest;
 import ru.courseproject.analiticsimulator.dto.RegisterRequest;
+import ru.courseproject.analiticsimulator.user.account.model.User;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,10 +39,10 @@ public class AuthController {
     @Path("/login")
     public Response authentication(@Valid LoginRequest authRequest) {
         try {
-            authService.authentication(authRequest);
+            User user = authService.authentication(authRequest);
             String token = Jwt.issuer(issuer)
-                    .upn(authRequest.getEmailOrUsername())
-                    .groups(new HashSet<>(Arrays.asList("User", "Admin")))
+                    .upn(user.getId().toString())
+                    .groups(user.getRole())
                     .expiresIn(expirySeconds)
                     .sign();
             return Response.ok(token).build();

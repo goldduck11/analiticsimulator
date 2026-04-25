@@ -1,30 +1,33 @@
 package ru.courseproject.analiticsimulator.task.task.service;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import ru.courseproject.analiticsimulator.dto.SubmissionResult;
 import ru.courseproject.analiticsimulator.dto.TaskDto;
+import ru.courseproject.analiticsimulator.dto.UserProgressDto;
+import ru.courseproject.analiticsimulator.dto.TopicDto;
 import ru.courseproject.analiticsimulator.task.task.model.Task;
 import ru.courseproject.analiticsimulator.task.task.repository.TaskRepository;
+import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
 import ru.courseproject.analiticsimulator.user.pogress.service.UserProgressService;
 
+import java.util.Collections;
 import java.util.List;
 
 @ApplicationScoped
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final UserProgressService userProgressService;
+    private final UserProgressService  userProgressService;
 
-    public TaskService(TaskRepository taskRepository, UserProgressService userProgressService) {
+    public TaskService(TaskRepository taskRepository, UserProgressService userProgressService, SecurityIdentity securityIdentity) {
         this.taskRepository = taskRepository;
         this.userProgressService = userProgressService;
     }
 
-    public List<TaskDto> getAllTasks() {
-        return taskRepository.findAllWithTopic().stream()
-                .map(this::mapToDto)
-                .toList();
+    public List<UserProgressDto> getAllTasksWithProgress() {
+        return userProgressService.getAllUserTaskWithProgress();
     }
 
     public Task getTaskById(Long taskId) {
@@ -33,19 +36,27 @@ public class TaskService {
     }
 
     @Transactional
-    public SubmissionResult submitAnswer(String userEmail, Long taskId, String answer) {
+    public SubmissionResult submitAnswer(Long taskId, String answer) {
         Task task = getTaskById(taskId);
-        UserProgressService.UserSubmissionResult result = userProgressService.saveProgress(userEmail, task, answer);
+        UserProgressService.UserSubmissionResult result = userProgressService.saveProgress(task, answer);
         return new SubmissionResult(result.correct(), result.score(), result.message(), result.alreadyCompleted());
     }
 
-    private TaskDto mapToDto(Task task) {
-        TaskDto dto = new TaskDto();
-        dto.setId(task.getId());
+    private <T extends TaskDto> T mapToTaskDto(Task task, T dto) {
+        dto.setTaskId(task.getId());
         dto.setQuestion(task.getQuestion());
-        dto.setType(task.getType().name());
-        dto.setTopicName(task.getTopic().getName());
-        dto.setHint(task.getHint());
+        dto.setTopicId(task.getTopic().getId());
         return dto;
+    }
+
+    private UserProgressDto mapToTaskProgressDto(UserProgress userProgress) {
+        UserProgressDto taskProgressDto = mapToTaskDto(userProgress.getTask(), new UserProgressDto());
+        taskProgressDto.setCompleted(userProgress.isCompleted());
+        taskProgressDto.setScore(userProgress.getScore());
+        return taskProgressDto;
+    }
+
+    public List<TopicDto> getAllTopics() {
+        return Collections.emptyList();
     }
 }

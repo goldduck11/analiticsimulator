@@ -10,6 +10,7 @@ import ru.courseproject.analiticsimulator.user.account.model.User;
 import ru.courseproject.analiticsimulator.user.account.repository.UserRepository;
 
 import javax.naming.AuthenticationException;
+import java.util.List;
 
 @ApplicationScoped
 public class AuthService {
@@ -20,11 +21,12 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
-    public void authentication(LoginRequest loginRequest) throws AuthenticationException {
+    public User authentication(LoginRequest loginRequest) throws AuthenticationException {
         User user = userRepository.findByEmailOrUsername(loginRequest.getEmailOrUsername(), loginRequest.getEmailOrUsername());
         if (user == null || !BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
             throw new AuthenticationException("Неверное имя пользователя или пароля");
         }
+        return user;
     }
 
     @Transactional
@@ -38,7 +40,6 @@ public class AuthService {
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(BCrypt.hashpw(registerRequest.getPassword(), BCrypt.gensalt()));
-        user.setRole("USER");
 
         userRepository.save(user);
         return new AuthResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail());

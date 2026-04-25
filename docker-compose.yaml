@@ -36,6 +36,6 @@ services:
     build: ./client
     container_name: web_client
     ports:
-      - "3000:80" # Предположим, фронт внутри слушает 80, а снаружи 3000
+      - "3000:3000" # Предположим, фронт внутри слушает 80, а снаружи 3000
     depends_on:
       - backend
