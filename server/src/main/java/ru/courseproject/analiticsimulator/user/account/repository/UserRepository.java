@@ -26,20 +26,8 @@ public class UserRepository implements PanacheRepository<User> {
         return count("username", username) > 0;
     }
 
-    public boolean existsByEmailAndUsername(String email, String username) {
-        return count("email = ?1 AND username = ?2", email, username) > 0;
-    }
-
     public boolean existsByEmailOrUsername(String email, String username) {
         return count("email = ?1 OR username = ?2", email, username) > 0;
-    }
-
-    public Optional<User> findByEmailWithProgress(String email) {
-        return getEntityManager().createQuery(
-                        "SELECT u FROM User u LEFT JOIN FETCH u.progressList WHERE u.email = :email", User.class)
-                .setParameter("email", email)
-                .getResultStream()
-                .findFirst();
     }
 
     @Transactional

@@ -1,17 +1,15 @@
-// Типы заданий и сложность
 export enum TaskType {
-  TEST = 'test',
-  ERROR_FIND = 'error_find',
-  OPEN = 'open',
+  TEST = 'TEST',
+  ERROR_FIND = 'ERROR_DETECTION',
+  OPEN = 'PRACTICE',
 }
 
 export enum Difficulty {
-  EASY = 'easy',
-  MEDIUM = 'medium',
-  HARD = 'hard',
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
 }
 
-// Кто пользователь и что приходит после входа
 export interface User {
   id: string;
   email: string;
@@ -30,7 +28,6 @@ export interface AuthResponse {
   user: User;
 }
 
-// Карточка задания и расширенное описание (с вопросами и т.д.)
 export interface Task {
   id: string;
   title: string;
@@ -60,24 +57,16 @@ export interface ErrorItem {
 
 export interface TaskDetail extends Task {
   content: string;
-  /** Тест: варианты ответов */
   questions?: TestQuestion[];
-  /** Найди ошибку: куски текста, часть с багами */
   artifacts?: ErrorItem[];
-  /** Открытый ответ: шаблон или подсказка к формулировке */
   artifactTemplate?: string;
 }
 
-// Что пользователь отправляет и что приходит после проверки задания
 export interface SubmissionAnswer {
   questionId?: string;
   selectedOptionId?: string;
   foundErrors?: string[];
   openAnswer?: string;
-}
-
-export interface SubmissionRequest {
-  answers: SubmissionAnswer;
 }
 
 export interface Feedback {
@@ -100,7 +89,6 @@ export interface SubmissionResult {
   completedAt: string;
 }
 
-// Сводка по прогрессу и история попыток
 export interface HistoryItem {
   taskId: string;
   taskTitle: string;
@@ -117,7 +105,6 @@ export interface UserProgress {
   history: HistoryItem[];
 }
 
-// Если бэкенд завернёт ответ в { data, success, message } — сюда
 export interface ApiResponse<T> {
   data: T;
   success: boolean;

@@ -1,17 +1,10 @@
 package ru.courseproject.analiticsimulator.dto;
 
-import lombok.Data;
+import java.util.Map;
+import java.util.List;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
-/**
- * DTO для отправки ответа на задание
- */
-@Data
-public class SubmissionRequest {
-
-    @NotBlank(message = "Ответ не может быть пустым")
-    @Size(max = 2000, message = "Ответ слишком длинный")
-    private String answer;
-}
+public record SubmissionRequest(
+    Map<String, String> answers,
+    List<String> foundErrors,
+    String openAnswer
+) {}

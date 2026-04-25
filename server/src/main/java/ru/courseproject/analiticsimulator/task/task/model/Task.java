@@ -2,6 +2,7 @@ package ru.courseproject.analiticsimulator.task.task.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.courseproject.analiticsimulator.task.task.enums.ComplexityType;
 import ru.courseproject.analiticsimulator.task.task.enums.TaskType;
 import ru.courseproject.analiticsimulator.task.topic.model.Topic;
 
@@ -22,10 +23,6 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String answer;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TaskType type;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
@@ -33,5 +30,13 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String hint;
 
-    private int maxScore = 10;
+    private TaskType taskType;
+
+    @Column(name = "max_score")
+    private int maxScore = 100;
+
+    private ComplexityType complexity;
+
+    @Column(columnDefinition = "TEXT")
+    private String expectedKeywords; // ← НОВОЕ ПОЛЕ
 }

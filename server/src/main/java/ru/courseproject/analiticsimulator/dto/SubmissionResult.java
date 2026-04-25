@@ -1,16 +1,25 @@
 package ru.courseproject.analiticsimulator.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.util.List;
 
-/**
- * DTO для результата проверки ответа на задание
- */
-@Data
-@AllArgsConstructor
-public class SubmissionResult {
-    private boolean correct;
-    private int score;
-    private String message;
-    private boolean alreadyCompleted;
-}
+public record SubmissionResult(
+    String submissionId,
+    String taskId,
+    String taskTitle,
+    int score,
+    int maxScore,
+    FeedbackDto feedback,
+    String completedAt
+) {}
+
+public record FeedbackDto(
+    int correct,
+    int total,
+    List<FeedbackDetailDto> details
+) {}
+
+public record FeedbackDetailDto(
+    String questionId,
+    boolean isCorrect,
+    String correctAnswer
+) {}
