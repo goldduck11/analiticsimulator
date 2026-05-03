@@ -1,10 +1,20 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, Roboto_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
-const _geist = Geist({ subsets: ['latin'] });
-const _geistMono = Geist_Mono({ subsets: ['latin'] });
+
+const _geist = Inter({
+  variable: '--font-geist',
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  subsets: ['latin'],
+});
+
+const _geistMono = Roboto_Mono({
+  variable: '--font-geist-mono',
+  weight: ['100', '200', '300', '400', '500', '600', '700'],
+  subsets: ['latin'],
+});
 
 export const metadata: Metadata = {
   title: 'Analyst Trainer — тренажёр аналитика',
@@ -18,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <body className={`${_geist.variable} ${_geistMono.variable} font-sans antialiased`}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
