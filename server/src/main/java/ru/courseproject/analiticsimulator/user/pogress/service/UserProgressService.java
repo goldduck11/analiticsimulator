@@ -5,12 +5,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import ru.courseproject.analiticsimulator.dto.UserProgressDto;
 import ru.courseproject.analiticsimulator.task.task.model.Task;
+import ru.courseproject.analiticsimulator.task.task.repository.TaskRepository;
 import ru.courseproject.analiticsimulator.user.account.model.User;
 import ru.courseproject.analiticsimulator.user.account.repository.UserRepository;
 import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
 import ru.courseproject.analiticsimulator.user.pogress.repository.UserProgressRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -20,12 +22,14 @@ public class UserProgressService {
     private final UserRepository userRepository;
     private final SecurityIdentity securityIdentity;
     private final UserProgressRepository userProgressRepository;
+    private final TaskRepository taskRepository;
 
-    public UserProgressService(UserProgressRepository progressRepository, UserRepository userRepository, SecurityIdentity securityIdentity, UserProgressRepository userProgressRepository) {
+    public UserProgressService(UserProgressRepository progressRepository, UserRepository userRepository, SecurityIdentity securityIdentity, UserProgressRepository userProgressRepository, TaskRepository taskRepository) {
         this.progressRepository = progressRepository;
         this.userRepository = userRepository;
         this.securityIdentity = securityIdentity;
         this.userProgressRepository = userProgressRepository;
+        this.taskRepository = taskRepository;
     }
 
     @Transactional
@@ -59,12 +63,18 @@ public class UserProgressService {
     }
 
     public List<UserProgressDto> getAllUserTaskWithProgress() {
-        User user = userRepository.findByIdOptional(Long.valueOf(securityIdentity.getPrincipal().getName()))
+        String principalName = securityIdentity.getPrincipal().getName();
+        User user = userRepository.findByIdOptional(Long.valueOf(principalName))
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return userProgressRepository.findByUserId(user.getId())
+        List<UserProgress> userProgressList = userProgressRepository.findByUserId(user.getId());
+        Map<Long, UserProgress> progressByTaskId = userProgressList.stream()
+                .collect(Collectors.toMap(up -> up.getTask().getId(), up -> up, (a, b) -> a));
+
+        List<UserProgressDto> result = taskRepository.findAllWithTopic()
                 .stream()
-                .map(this::mapToDto)
+                .map(task -> mapTaskWithProgress(task, progressByTaskId.get(task.getId())))
                 .collect(Collectors.toList());
+        return result;
     }
 
     public record UserSubmissionResult(
@@ -91,9 +101,31 @@ public class UserProgressService {
         UserProgressDto userProgressDto = new UserProgressDto();
         userProgressDto.setTaskId(userProgress.getTask().getId());
         userProgressDto.setQuestion(userProgress.getTask().getQuestion());
+        userProgressDto.setTopicId(userProgress.getTask().getTopic().getId());
+        userProgressDto.setTaskType(userProgress.getTask().getTaskType().name());
+        userProgressDto.setComplexity(userProgress.getTask().getComplexity() != null
+                ? userProgress.getTask().getComplexity().name()
+                : null);
         userProgressDto.setScore(userProgress.getScore());
         userProgressDto.setCompleted(userProgress.isCompleted());
         return userProgressDto;
+    }
+
+    private UserProgressDto mapTaskWithProgress(Task task, UserProgress userProgress) {
+        UserProgressDto dto = new UserProgressDto();
+        dto.setTaskId(task.getId());
+        dto.setQuestion(task.getQuestion());
+        dto.setTopicId(task.getTopic().getId());
+        dto.setTaskType(task.getTaskType().name());
+        dto.setComplexity(task.getComplexity() != null ? task.getComplexity().name() : null);
+        if (userProgress != null) {
+            dto.setScore(userProgress.getScore());
+            dto.setCompleted(userProgress.isCompleted());
+        } else {
+            dto.setScore(0);
+            dto.setCompleted(false);
+        }
+        return dto;
     }
 
 }

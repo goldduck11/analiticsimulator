@@ -70,18 +70,17 @@ function TaskPageContent() {
   }
 
   const renderTaskContent = () => {
-    switch (currentTask.type) {
-      case TaskType.TEST:
-        return <TestTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
-      case TaskType.ERROR_FIND:
-        return (
-          <ErrorFindTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
-        );
-      case TaskType.OPEN:
-        return <OpenTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
-      default:
-        return <p>Неизвестный тип задания</p>;
+    if (currentTask.type === TaskType.TEST && currentTask.questions?.length) {
+      return <TestTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
     }
+    if (currentTask.type === TaskType.ERROR_FIND && currentTask.artifacts?.length) {
+      return <ErrorFindTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
+    }
+    if (currentTask.type === TaskType.OPEN) {
+      return <OpenTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
+    }
+    /* С бэкенда приходят типы TEST/ERROR без вариантов — показываем открытый ответ */
+    return <OpenTask task={currentTask} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
   };
 
   return (

@@ -32,8 +32,8 @@ public class Task {
 
     private TaskType taskType;
 
-    @Column(name = "max_score")
-    private int maxScore = 100;
+    @Column(name = "max_score", nullable = false, columnDefinition = "integer default 100")
+    private Integer maxScore = 100;
 
     private ComplexityType complexity;
 }

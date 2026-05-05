@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Empty } from '@/components/ui/empty';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { TaskCard } from './task-card';
 import { useTaskStore } from '@/store';
 import { TaskType, Difficulty } from '@/types';
@@ -115,10 +115,12 @@ export function TaskList() {
 
       {/* Сетка карточек заданий */}
       {filteredTasks.length === 0 ? (
-        <Empty
-          title="Задания не найдены"
-          description="Попробуйте изменить параметры поиска или фильтры"
-        />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>Задания не найдены</EmptyTitle>
+            <EmptyDescription>Попробуйте изменить параметры поиска или фильтры</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTasks.map((task) => (

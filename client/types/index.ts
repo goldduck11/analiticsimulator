@@ -23,6 +23,7 @@ export interface Session {
   id: string;
   userId: string;
   expiresAt: string;
+  accessToken?: string;
 }
 
 export interface AuthResponse {
@@ -37,6 +38,8 @@ export interface Task {
   type: TaskType;
   difficulty: Difficulty;
   description: string;
+  completed?: boolean;
+  score?: number;
 }
 
 export interface TestOption {
@@ -60,6 +63,8 @@ export interface ErrorItem {
 
 export interface TaskDetail extends Task {
   content: string;
+  /** Минимум слов для открытого ответа (с бэкенда можно ставить 1 для коротких ответов) */
+  minWords?: number;
   /** Тест: варианты ответов */
   questions?: TestQuestion[];
   /** Найди ошибку: куски текста, часть с багами */

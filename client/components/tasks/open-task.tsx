@@ -18,7 +18,7 @@ export function OpenTask({ task, onSubmit, isSubmitting }: OpenTaskProps) {
   const [answer, setAnswer] = useState(task.artifactTemplate || '');
 
   const wordCount = answer.trim().split(/\s+/).filter(Boolean).length;
-  const minWords = 50;
+  const minWords = task.minWords ?? 50;
   const isValid = wordCount >= minWords;
 
   const handleSubmit = async () => {
