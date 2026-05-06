@@ -27,9 +27,13 @@ services:
       QUARKUS_DATASOURCE_USERNAME: myuser
       QUARKUS_DATASOURCE_PASSWORD: secret
       # Пути к ключам JWT внутри контейнера
-      SMALLRYE_JWT_SIGN_KEY_LOCATION: /deployments/privateKeyPkcs8.pem
+#      SMALLRYE_JWT_SIGN_KEY_LOCATION: /deployments/privateKeyPkcs8.pem
+      JAVA_ENABLE_DEBUG: true
+      JAVA_DEBUG_PORT: 5005
+      QUARKUS_HTTP_HOST: 0.0.0.0
     ports:
       - "8080:8080"
+      - "5005:5005"
 
   # 3. Фронтенд
   frontend:
