@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import ru.courseproject.analiticsimulator.task.task.model.Task;
 
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class TaskRepository implements PanacheRepository<Task> {
@@ -29,5 +30,13 @@ public class TaskRepository implements PanacheRepository<Task> {
         return getEntityManager().createQuery(
                         "SELECT t FROM Task t LEFT JOIN FETCH t.topic ORDER BY t.id", Task.class)
                 .getResultList();
+    }
+
+    public Optional<Task> findByIdWithTopic(Long id) {
+        return getEntityManager().createQuery(
+                        "SELECT t FROM Task t LEFT JOIN FETCH t.topic WHERE t.id = :id", Task.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .findFirst();
     }
 }

@@ -284,9 +284,9 @@ export const api = {
     },
 
     async getById(id: string): Promise<TaskDetail> {
-      const rows = await fetchTaskRows();
-      const row = rows.find((x) => String(x.taskId) === id);
-      if (!row) throw new Error('Задание не найдено');
+      const row = await requestJson<UserProgressRow>(`/api/tasks/${encodeURIComponent(id)}`, {
+        method: 'GET',
+      });
       return rowToDetail(row);
     },
 

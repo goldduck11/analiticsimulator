@@ -14,6 +14,7 @@ import ru.courseproject.analiticsimulator.user.pogress.service.UserProgressServi
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class TaskService {
@@ -28,6 +29,10 @@ public class TaskService {
 
     public List<UserProgressDto> getAllTasksWithProgress() {
         return userProgressService.getAllUserTaskWithProgress();
+    }
+
+    public Optional<UserProgressDto> findTaskWithProgress(Long taskId) {
+        return userProgressService.findUserTaskWithProgress(taskId);
     }
 
     public Task getTaskById(Long taskId) {

@@ -5,6 +5,7 @@ import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -37,6 +38,13 @@ public class TaskController {
     @Path("/tasks")
     public List<UserProgressDto> getAllTasks() {
         return taskService.getAllTasksWithProgress();
+    }
+
+    @GET
+    @Path("/{id}")
+    public UserProgressDto getTaskById(@PathParam("id") Long id) {
+        return taskService.findTaskWithProgress(id)
+                .orElseThrow(() -> new NotFoundException("Задание не найдено"));
     }
 
     @POST

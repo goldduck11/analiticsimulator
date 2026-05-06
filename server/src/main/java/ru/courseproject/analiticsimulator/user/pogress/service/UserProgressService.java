@@ -13,6 +13,7 @@ import ru.courseproject.analiticsimulator.user.pogress.repository.UserProgressRe
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -75,6 +76,19 @@ public class UserProgressService {
                 .map(task -> mapTaskWithProgress(task, progressByTaskId.get(task.getId())))
                 .collect(Collectors.toList());
         return result;
+    }
+
+    public Optional<UserProgressDto> findUserTaskWithProgress(Long taskId) {
+        String principalName = securityIdentity.getPrincipal().getName();
+        User user = userRepository.findByIdOptional(Long.valueOf(principalName))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<Task> taskOpt = taskRepository.findByIdWithTopic(taskId);
+        if (taskOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        Task task = taskOpt.get();
+        UserProgress progress = progressRepository.findByUserIdAndTaskId(user.getId(), taskId).orElse(null);
+        return Optional.of(mapTaskWithProgress(task, progress));
     }
 
     public record UserSubmissionResult(
