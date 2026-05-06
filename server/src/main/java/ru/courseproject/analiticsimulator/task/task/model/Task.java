@@ -6,6 +6,9 @@ import ru.courseproject.analiticsimulator.task.task.enums.ComplexityType;
 import ru.courseproject.analiticsimulator.task.task.enums.TaskType;
 import ru.courseproject.analiticsimulator.task.topic.model.Topic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "tasks")
 @Data
@@ -20,8 +23,13 @@ public class Task {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String question;
 
-    @Column(columnDefinition = "TEXT")
-    private String answer;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "task_answers",
+            joinColumns = @JoinColumn(name = "task_id")
+    )
+    @Column(name = "answer", columnDefinition = "TEXT")
+    private List<String> answers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", nullable = false)

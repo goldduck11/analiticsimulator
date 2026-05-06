@@ -44,4 +44,10 @@ public class TaskController {
     public SubmissionResult submitAnswer(@PathParam("taskId") Long taskId, @Valid SubmissionRequest submission) {
         return taskService.submitAnswer(taskId, submission.getAnswer());
     }
+
+    @POST
+    @Path("/{id}")
+    public SubmissionResult submitTaskAnswer(@PathParam("id") Long id, @Valid SubmissionRequest submission) {
+        return taskService.submitAnswer(id, submission.getAnswer());
+    }
 }

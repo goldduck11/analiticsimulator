@@ -11,6 +11,8 @@ RUN mvn package -DskipTests
 # 2. Runtime stage
 FROM eclipse-temurin:17-jre
 WORKDIR /deployments
+COPY --from=build /build/src/main/resources/privateKeyPkcs8.pem /deployments/privateKeyPkcs8.pem
+COPY --from=build /build/src/main/resources/publicKey.pem /deployments/publicKey.pem
 
 COPY --from=build /build/target/quarkus-app/ /deployments/
 

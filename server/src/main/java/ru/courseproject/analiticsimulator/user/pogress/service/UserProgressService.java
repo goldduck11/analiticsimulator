@@ -92,7 +92,11 @@ public class UserProgressService {
         }
 
         return switch (task.getTaskType()) {
-            case TEST, ERROR_DETECTION -> userAnswer.trim().equalsIgnoreCase(task.getAnswer().trim());
+            case TEST, ERROR_DETECTION -> task.getAnswers() != null
+                    && task.getAnswers().stream()
+                    .filter(answer -> answer != null && !answer.trim().isEmpty())
+                    .anyMatch(answer -> answer.trim().equalsIgnoreCase(userAnswer.trim()));
+
             case PRACTICE -> true;
         };
     }
