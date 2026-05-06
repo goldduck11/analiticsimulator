@@ -17,7 +17,7 @@ public class UserProgressRepository implements PanacheRepository<UserProgress> {
     }
 
     public List<UserProgress> findByUserId(Long userId) {
-        return list("user.id", Sort.descending("completedAt"), userId);
+        return list("user.id = ?1", Sort.descending("lastAttemptAt"), userId);
     }
 
     public List<UserProgress> findByUserIdWithDetails(Long userId) {
@@ -50,5 +50,6 @@ public class UserProgressRepository implements PanacheRepository<UserProgress> {
         if (userProgress.getId() == null) {
             persist(userProgress);
         }
+        flush();
     }
 }

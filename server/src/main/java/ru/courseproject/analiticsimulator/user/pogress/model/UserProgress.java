@@ -33,11 +33,14 @@ public class UserProgress {
 
     private int score = 0;
 
+    private LocalDateTime lastAttemptAt;
+
     private LocalDateTime completedAt;
 
     @PrePersist
     @PreUpdate
     protected void onUpdate() {
+        lastAttemptAt = LocalDateTime.now();
         if (completed && completedAt == null) {
             completedAt = LocalDateTime.now();
         }

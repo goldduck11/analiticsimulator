@@ -1,7 +1,6 @@
 package ru.courseproject.analiticsimulator.dto;
 
 import lombok.Data;
-import ru.courseproject.analiticsimulator.user.pogress.model.UserProgress;
 
 import java.io.Serializable;
 
@@ -16,5 +15,7 @@ public class TaskDto {
     private Long topicId;
     private String taskType;
     private String complexity;
+
+    private String uiPayload;
 
 }

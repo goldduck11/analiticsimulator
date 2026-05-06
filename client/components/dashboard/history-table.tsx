@@ -41,7 +41,9 @@ export function HistoryTable({ history }: HistoryTableProps) {
           <CardTitle>История выполнения</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground">Вы ещё не выполнили ни одного задания</p>
+          <p className="text-center text-muted-foreground">
+            История пуста - отправьте ответ на любое задание. Неверные ответы тоже попадут сюда.
+          </p>
         </CardContent>
       </Card>
     );
@@ -67,6 +69,7 @@ export function HistoryTable({ history }: HistoryTableProps) {
             {history.map((item, idx) => {
               const Icon = getTaskIcon(item.taskType);
               const scorePercent = Math.round((item.score / item.maxScore) * 100);
+              const isFailedAttempt = item.completed === false;
 
               return (
                 <TableRow key={`${item.taskId}-${idx}`}>
@@ -86,10 +89,17 @@ export function HistoryTable({ history }: HistoryTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className={getScoreColor(item.score, item.maxScore)}>
-                      {item.score}/{item.maxScore}
-                    </span>
-                    <span className="ml-2 text-sm text-muted-foreground">({scorePercent}%)</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={getScoreColor(item.score, item.maxScore)}>
+                        {item.score}/{item.maxScore}
+                      </span>
+                      <span className="text-sm text-muted-foreground">({scorePercent}%)</span>
+                      {isFailedAttempt ? (
+                        <Badge variant="secondary" className="font-normal">
+                          не зачтено
+                        </Badge>
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{formatDate(item.date)}</TableCell>
                   <TableCell>

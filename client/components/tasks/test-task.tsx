@@ -32,8 +32,11 @@ export function TestTask({ task, onSubmit, isSubmitting }: TestTaskProps) {
   };
 
   const handleSubmit = async () => {
+    if (totalQuestions < 1) return;
+    const lastQ = questions[totalQuestions - 1];
+    const selectedText = lastQ ? answers[lastQ.id] : undefined;
     await onSubmit({
-      questionId: JSON.stringify(answers),
+      selectedOptionId: selectedText ?? '',
     });
   };
 
@@ -55,7 +58,9 @@ export function TestTask({ task, onSubmit, isSubmitting }: TestTaskProps) {
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
           className="h-full bg-primary transition-all duration-300"
-          style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
+          style={{
+            width: `${totalQuestions ? (answeredCount / totalQuestions) * 100 : 0}%`,
+          }}
         />
       </div>
 
@@ -97,12 +102,12 @@ export function TestTask({ task, onSubmit, isSubmitting }: TestTaskProps) {
                     htmlFor={`${currentQ.id}-${option.id}`}
                     className={cn(
                       'flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors',
-                      answers[currentQ.id] === option.id
+                      answers[currentQ.id] === option.text
                         ? 'border-primary bg-primary/5'
                         : 'hover:bg-muted/50'
                     )}
                   >
-                    <RadioGroupItem value={option.id} id={`${currentQ.id}-${option.id}`} />
+                    <RadioGroupItem value={option.text} id={`${currentQ.id}-${option.id}`} />
                     <span>{option.text}</span>
                   </Label>
                 ))}

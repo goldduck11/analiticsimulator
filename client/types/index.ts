@@ -51,7 +51,8 @@ export interface TestQuestion {
   id: string;
   question: string;
   options: TestOption[];
-  correctOptionId: string;
+  /** Не обязателен, если проверка только на бэкенде */
+  correctOptionId?: string;
 }
 
 export interface ErrorItem {
@@ -113,6 +114,7 @@ export interface HistoryItem {
   score: number;
   maxScore: number;
   date: string;
+  completed?: boolean;
 }
 
 export interface UserProgress {

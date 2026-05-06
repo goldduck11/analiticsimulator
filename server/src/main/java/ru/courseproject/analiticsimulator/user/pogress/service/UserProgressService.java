@@ -126,6 +126,8 @@ public class UserProgressService {
                 : null);
         userProgressDto.setScore(userProgress.getScore());
         userProgressDto.setCompleted(userProgress.isCompleted());
+        userProgressDto.setLastAttemptAt(userProgress.getLastAttemptAt());
+        userProgressDto.setUiPayload(userProgress.getTask().getUiPayload());
         return userProgressDto;
     }
 
@@ -136,12 +138,15 @@ public class UserProgressService {
         dto.setTopicId(task.getTopic().getId());
         dto.setTaskType(task.getTaskType().name());
         dto.setComplexity(task.getComplexity() != null ? task.getComplexity().name() : null);
+        dto.setUiPayload(task.getUiPayload());
         if (userProgress != null) {
             dto.setScore(userProgress.getScore());
             dto.setCompleted(userProgress.isCompleted());
+            dto.setLastAttemptAt(userProgress.getLastAttemptAt());
         } else {
-            dto.setScore(0);
+            dto.setScore(null);
             dto.setCompleted(false);
+            dto.setLastAttemptAt(null);
         }
         return dto;
     }

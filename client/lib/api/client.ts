@@ -33,6 +33,8 @@ interface UserProgressRow {
   isCompleted?: boolean;
   completed?: boolean;
   score: number | null;
+  uiPayload?: string | null;
+  lastAttemptAt?: string | null;
 }
 
 interface SubmitDto {
@@ -140,17 +142,50 @@ function rowToTask(row: UserProgressRow): Task {
     difficulty: toDifficulty(row.complexity),
     description: '',
     completed: Boolean(row.completed ?? row.isCompleted),
-    score: row.score ?? undefined,
+    score: row.score == null ? undefined : row.score,
   };
 }
 
 function rowToDetail(row: UserProgressRow): TaskDetail {
   const task = rowToTask(row);
-  return {
+  const base: TaskDetail = {
     ...task,
     content: row.question,
     minWords: 1,
   };
+
+  const raw = row.uiPayload?.trim();
+  if (!raw) return base;
+
+  try {
+    const p = JSON.parse(raw) as {
+      scenario?: string;
+      questions?: Array<{ id: string; question?: string; options: Array<{ id: string; text: string }> }>;
+      artifacts?: Array<{ id: string; text: string; hasError: boolean }>;
+    };
+
+    if (task.type === TaskType.TEST && p.questions?.length) {
+      return {
+        ...base,
+        questions: p.questions.map((q) => ({
+          ...q,
+          question: q.question?.trim() ? q.question : row.question,
+        })),
+      };
+    }
+
+    if (task.type === TaskType.ERROR_FIND && p.artifacts?.length) {
+      return {
+        ...base,
+        content: p.scenario?.trim() ? p.scenario : row.question,
+        artifacts: p.artifacts,
+      };
+    }
+  } catch {
+    /* невалидный uiPayload */
+  }
+
+  return base;
 }
 
 function answersToText(answers: SubmissionAnswer): string {
@@ -326,14 +361,18 @@ export const api = {
     async get(): Promise<UserProgress> {
       const rows = await fetchTaskRows();
       const completedRows = rows.filter((r) => Boolean(r.completed ?? r.isCompleted));
-      const history: HistoryItem[] = completedRows.map((r) => ({
+      const attemptedRows = rows.filter((r) => r.score != null);
+
+      const history: HistoryItem[] = attemptedRows.map((r) => ({
         taskId: String(r.taskId),
         taskTitle: r.question.length > 80 ? `${r.question.slice(0, 77)}...` : r.question,
         taskType: toTaskType(r.taskType),
         score: r.score ?? 0,
         maxScore: 100,
-        date: new Date().toISOString(),
+        date: r.lastAttemptAt ?? new Date().toISOString(),
+        completed: Boolean(r.completed ?? r.isCompleted),
       }));
+
       return {
         totalScore: completedRows.reduce((s, r) => s + (r.score ?? 0), 0),
         completedTasks: completedRows.length,

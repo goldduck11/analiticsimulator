@@ -44,4 +44,8 @@ public class Task {
     private Integer maxScore = 100;
 
     private ComplexityType complexity;
+
+    /** JSON для фронта: вопросы с вариантами (TEST) или артефакты (ERROR_DETECTION). */
+    @Column(name = "ui_payload", columnDefinition = "TEXT")
+    private String uiPayload;
 }
