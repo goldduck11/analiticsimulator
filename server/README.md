@@ -81,6 +81,13 @@ curl -X POST http://localhost:8080/api/tasks/submit/1 \
   -H "Authorization: Bearer <токен>" \
   -d '{"answer":"SELECT * FROM users;"}'
 ```
+### Отправить ответ на задание по id
+
+```bash
+curl -X POST http://localhost:8080/api/tasks/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <токен>" \
+  -d '{"answer":"SELECT * FROM users;"}'
 
 ### Личный кабинет (прогресс) 
 
