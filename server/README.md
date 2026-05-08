@@ -28,7 +28,6 @@ Backend migrated from Spring Boot to Quarkus.
   - `POST /api/auth/register`
 - Protected endpoints:
   - `/api/*` (except public ones)
-- HTTP Basic auth is enabled and validated against `users` table.
 
 ## API docs
 
@@ -43,7 +42,7 @@ Backend migrated from Spring Boot to Quarkus.
 
 ### Регистрация
 
-```
+```bash
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"Иван","email":"ivan@test.com","username":"ivan","password":"123456"}'
@@ -51,7 +50,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 ### Логин (получение JWT токена)
 
-```
+```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"emailOrUsername":"ivan@test.com","password":"123456"}'
@@ -61,21 +60,21 @@ curl -X POST http://localhost:8080/api/auth/login \
 
 ### Получить все задания с прогрессом пользователя
 
-```
+```bash
 curl -X GET http://localhost:8080/api/tasks/tasks \
   -H "Authorization: Bearer <токен>"
 ```
 
 ### Получить конкретное задание
 
-```
+```bash
 curl -X GET http://localhost:8080/api/tasks/1 \
   -H "Authorization: Bearer <токен>"
 ```
 
 ### Отправить ответ на задание (например, задание 1)
 
-```
+```bash
 curl -X POST http://localhost:8080/api/tasks/submit/1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <токен>" \
@@ -88,11 +87,4 @@ curl -X POST http://localhost:8080/api/tasks/1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <токен>" \
   -d '{"answer":"SELECT * FROM users;"}'
-```
-
-### Личный кабинет (прогресс) 
-
-```
-curl -X GET http://localhost:8080/api/tasks/tasks \
-  -H "Authorization: Bearer <токен>"
 ```
